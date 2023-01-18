@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class CabInvoiceGenerator {
-    public static final double COST_PER_KILOMETER = 10;
-    public static final double COST_PER_MINUTE = 1;
-    public static final double MINIMUM_FARE = 5;
+    public static final double NORMAL_RIDE_COST_PER_KILOMETER = 10;
+    public static final double NORMAL_RIDE_COST_PER_MINUTE = 1;
+    public static final double NORMAL_RIDE_MINIMUM_FARE = 5;
+    public static final double PREMIUM_RIDE_COST_PER_KILOMETER = 15;
+    public static final double PREMIUM_RIDE_COST_PER_MINUTE = 2;
+    public static final double PREMIUM_RIDE_MINIMUM_FARE = 20;
     public static HashMap<String, ArrayList<Ride>> rideRepository = new HashMap<>();
 
     public static void main(String[] args) {
@@ -26,11 +29,13 @@ public class CabInvoiceGenerator {
                 double distance = input.nextDouble();
                 System.out.print("Enter time in minutes: ");
                 double time = input.nextDouble();
-                addRide(userId, distance, time);
+                System.out.print("Enter ride type (Normal/Premium): ");
+                String rideType = input.nextLine();
+                addRide(userId, distance, time, rideType);
             } else if (choice == 2) {
                 System.out.print("Enter user id: ");
                 String userId = input.nextLine();
-                ArrayList<Ride> rides =new ArrayList<>();
+                ArrayList<Ride> rides = new ArrayList<>();
                 if (rideRepository.containsKey(userId)){
                     rides = rideRepository.get(userId);
                 }
@@ -45,13 +50,13 @@ public class CabInvoiceGenerator {
         input.close();
     }
 
-    public static void addRide(String userId, double distance, double time){
+    public static void addRide(String userId, double distance, double time, String rideType){
         if(rideRepository.containsKey(userId)){
-            rideRepository.get(userId).add(new Ride(distance,time));
+            rideRepository.get(userId).add(new Ride(distance,time,rideType));
         }
         else{
             ArrayList<Ride> rides = new ArrayList<>();
-            rides.add(new Ride(distance,time));
+            rides.add(new Ride(distance,time,rideType));
             rideRepository.put(userId,rides);
         }
     }
@@ -59,18 +64,28 @@ public class CabInvoiceGenerator {
     public static double calculateFare(ArrayList<Ride> rides) {
         double fare = 0;
         for (Ride ride : rides) {
-            fare += ride.distance * COST_PER_KILOMETER + ride.time * COST_PER_MINUTE;
+            if(ride.rideType.equalsIgnoreCase("Normal")){
+                fare += ride.distance * NORMAL_RIDE_COST_PER_KILOMETER + ride.time * NORMAL_RIDE_COST_PER_MINUTE;
+                fare = fare < NORMAL_RIDE_MINIMUM_FARE * rides.size() ? NORMAL_RIDE_MINIMUM_FARE * rides.size() : fare;
+            }else if(ride.rideType.equalsIgnoreCase("Premium")){
+                fare += ride.distance * PREMIUM_RIDE_COST_PER_KILOMETER + ride.time * PREMIUM_RIDE_COST_PER_MINUTE;
+                fare = fare < PREMIUM_RIDE_MINIMUM_FARE * rides.size() ? PREMIUM_RIDE_MINIMUM_FARE * rides.size() : fare;
+            }
         }
-        return fare < MINIMUM_FARE * rides.size() ? MINIMUM_FARE * rides.size() : fare;
+        return fare;
     }
 
     static class Ride {
         public double distance;
         public double time;
+        public String rideType;
 
-        public Ride(double distance, double time) {
+        public Ride(double distance, double time, String rideType) {
             this.distance = distance;
             this.time = time;
+            this.rideType = rideType;
         }
     }
 }
+
+
