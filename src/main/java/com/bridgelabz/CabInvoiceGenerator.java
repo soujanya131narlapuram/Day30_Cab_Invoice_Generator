@@ -26,7 +26,9 @@ public class CabInvoiceGenerator {
                 rides.add(new Ride(distance, time));
             } else if (choice == 2) {
                 double fare = calculateFare(rides);
-                System.out.println("Total fare for the rides is: " + fare);
+                System.out.println("Total number of rides: " + rides.size());
+                System.out.println("Total fare for the rides: " + fare);
+                System.out.println("Average fare per ride: " + fare/rides.size());
             } else if (choice == 3) {
                 break;
             }
@@ -37,8 +39,7 @@ public class CabInvoiceGenerator {
     public static double calculateFare(ArrayList<Ride> rides) {
         double fare = 0;
         for (Ride ride : rides) {
-            fare += ride.distance * COST_PER_KILOMETER + ride.
-                    time * COST_PER_MINUTE;
+            fare += ride.distance * COST_PER_KILOMETER + ride.time * COST_PER_MINUTE;
         }
         return fare < MINIMUM_FARE * rides.size() ? MINIMUM_FARE * rides.size() : fare;
     }
@@ -53,4 +54,3 @@ public class CabInvoiceGenerator {
         }
     }
 }
-
